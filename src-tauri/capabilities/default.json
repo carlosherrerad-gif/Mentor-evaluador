@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-window",
+  "description": "Ventana principal sin acceso a archivos, SQL ni comandos de sistema.",
+  "windows": ["main"],
+  "permissions": []
+}
