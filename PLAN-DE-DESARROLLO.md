@@ -34,4 +34,4 @@ La base Windows de Fase 1 y la distribución de Fase 9 tienen objetivos distinto
 
 Se creó el código inicial de interfaz y configuración Tauri. Todavía no se declara ejecutable ni instalada la aplicación. En la revisión inicial se encontraron Node y pnpm; cargo no está en PATH ni en la ubicación habitual del usuario y no se encontró el instalador de Visual Studio en su ruta habitual. Esto no demuestra ausencia de todas las instalaciones posibles, pero obliga a verificar y preparar el entorno antes de compilar Windows.
 
-Siguiente trabajo de Fase 1: resolver dependencias de desarrollo, instalar/verificar Rust y MSVC cuando sea necesario, compilar frontend y Tauri, ejecutar la ventana y probar navegación offline. No se considera cerrada la fase hasta obtener esa evidencia.
+Actualización: herramientas instaladas, frontend y Tauri compilados, ventana nativa abierta y navegación/recarga comprobadas con red emulada como desconectada. Fase 1 completada en este equipo; ver ESTADO-FASE-1.md y evidencia. Siguiente fase: proyectos y SQLite, después de revisar esta entrega. La instalación integral en una máquina limpia sigue reservada a Fase 9.

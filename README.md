@@ -1,6 +1,6 @@
 # Méntor Evaluador Inmobiliario
 
-Base inicial de desarrollo. Consulte PLAN-DE-DESARROLLO.md para alcance y aceptación de cada fase. No existe todavía una versión Windows compilada.
+Base Windows compilada y probada. Consulte PLAN-DE-DESARROLLO.md para alcance de cada fase y ESTADO-FASE-1.md para pruebas y limitaciones. Abra `entregas/Mentor-Evaluador-Fase1.exe` con doble clic en este equipo.
 
 ## Desarrollo
 

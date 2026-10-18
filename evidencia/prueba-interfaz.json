@@ -1,0 +1,37 @@
+{
+  "status": "aprobado",
+  "modules": [
+    {
+      "module": "01\nMis proyectos",
+      "title": "Tus terrenos y alternativas de desarrollo"
+    },
+    {
+      "module": "02\nDatos del proyecto",
+      "title": "La información que sostiene tu evaluación"
+    },
+    {
+      "module": "03\nPotencial inmobiliario",
+      "title": "Comprende lo que puedes desarrollar"
+    },
+    {
+      "module": "04\nEvaluación económica",
+      "title": "Evalúa ingresos, costos y rentabilidad"
+    },
+    {
+      "module": "05\nEscenarios comparativos",
+      "title": "Explora alternativas del mismo terreno"
+    },
+    {
+      "module": "06\nInformes",
+      "title": "Convierte tu evaluación en un documento"
+    },
+    {
+      "module": "07\nBiblioteca",
+      "title": "Reutiliza tu experiencia"
+    }
+  ],
+  "errors": [],
+  "external": [],
+  "offlineNavigation": true,
+  "limitation": "Prueba en Edge del frontend ya cargado. No certifica arranque offline de Tauri ni instalación Windows."
+}
