@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {randomBytes} from 'node:crypto';
+import {createMentorServer} from '../server/app.mjs';
+test('retirar acceso impide consultar el proyecto con una sesión todavía vigente',async t=>{
+  const origin='http://mentor.test';const {server}=createMentorServer({filename:':memory:',origin});
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));
+  const base=`http://127.0.0.1:${server.address().port}/api`;
+  const request=async(path,method='GET',data,cookie='')=>{const r=await fetch(base+path,{method,headers:{Origin:origin,'Content-Type':'application/json',Cookie:cookie},body:data===undefined?undefined:JSON.stringify(data)});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]};};
+  const owner=await request('/setup','POST',{name:'Admin prueba',email:'admin@example.test',password:randomBytes(20).toString('hex')});
+  const project=(await request('/projects','POST',{name:'Prueba de revocación'},owner.cookie)).data.project;
+  const link=(await request(`/projects/${project.id}/invitations`,'POST',{email:'lector@example.test',role:'reader'},owner.cookie)).data.link;
+  const token=new URL(link).searchParams.get('invitacion');
+  const reader=await request(`/invitations/${token}`,'POST',{name:'Lector de prueba',password:randomBytes(20).toString('hex')});
+  assert.equal((await request(`/projects/${project.id}`,'GET',undefined,reader.cookie)).status,200);
+  assert.equal((await request(`/projects/${project.id}/members/${reader.data.user.id}`,'DELETE',{},reader.cookie)).status,403);
+  assert.equal((await request(`/projects/${project.id}/members/${reader.data.user.id}`,'DELETE',{},owner.cookie)).status,200);
+  assert.equal((await request(`/projects/${project.id}`,'GET',undefined,reader.cookie)).status,404);
+  assert.equal((await request(`/projects/${project.id}/members/${owner.data.user.id}`,'DELETE',{},owner.cookie)).status,400);
+});

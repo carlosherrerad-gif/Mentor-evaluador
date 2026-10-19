@@ -1,5 +1,7 @@
 # Méntor Evaluador Inmobiliario
 
+**Ruta vigente desde el 19/10/2026: plataforma web compartida.** Ver README-WEB.md, PLAN-WEB.md y docs/ADR-001-PLATAFORMA-WEB.md. La información de escritorio siguiente es un antecedente de la Fase 1 anterior.
+
 Base Windows compilada y probada. Consulte PLAN-DE-DESARROLLO.md para alcance de cada fase y ESTADO-FASE-1.md para pruebas y limitaciones. Abra `entregas/Mentor-Evaluador-Fase1.exe` con doble clic en este equipo.
 
 ## Desarrollo

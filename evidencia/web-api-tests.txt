@@ -1,0 +1,20 @@
+✔ el acceso anónimo no revela proyectos y la configuración inicial solo ocurre una vez (219.2923ms)
+✔ login genérico, cookies privadas y cierre de sesión revocan acceso (379.8564ms)
+✔ proyecto y primer escenario se crean juntos y las revisiones evitan sobrescrituras (106.147ms)
+✔ editor invitado comparte el proyecto y crea alternativas independientes (248.2941ms)
+✔ lector puede consultar pero no editar, archivar, invitar ni crear escenarios (233.5667ms)
+✔ los miembros de otro proyecto no acceden a ficha, miembros, historial ni escenarios ajenos (261.3932ms)
+✔ invitaciones expiran, son de un uso y no permiten promoción de permisos (215.2882ms)
+✔ un enlace para una cuenta existente requiere sesión del destinatario (248.9318ms)
+✔ se bloquean escrituras entre orígenes y los intentos de acceso excesivos (947.3785ms)
+✔ persistencia: los proyectos y sesiones sobreviven al reinicio del servidor (1198.9613ms)
+✔ producción exige HTTPS y una clave para crear la primera cuenta (83.173ms)
+✔ retirar acceso impide consultar el proyecto con una sesión todavía vigente (335.3855ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4287.1662

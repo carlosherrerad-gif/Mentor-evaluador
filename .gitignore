@@ -4,3 +4,8 @@ src-tauri/target/
 src-tauri/gen/
 *.log
 entregas/*.exe
+data/
+.tmp/
+.env
+.env.*
+!.env.example
