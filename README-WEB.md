@@ -2,6 +2,8 @@
 
 Ruta vigente: PLAN-WEB.md. Decisión y límites: docs/ADR-001-PLATAFORMA-WEB.md.
 
+Actualización del 20/10/2026: primero completar V1 localmente; publicar al final (docs/ADR-002-DISENAR-V1-ANTES-DE-PUBLICAR.md). Propuesta integral de pantallas: docs/DISENO-INTEGRAL-V1.md. Maqueta sin datos en `/diseno-v1.html`, accesible con el servidor local.
+
 ## Requisitos y arranque local
 
 Node 24 LTS (>=24.14 y <25), pnpm 11.25. No necesita Rust para la versión web.

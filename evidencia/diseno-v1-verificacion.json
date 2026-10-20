@@ -1,0 +1,137 @@
+{
+  "pantallas": [
+    {
+      "pantalla": "01 Inicio",
+      "titulo": "Inicio"
+    },
+    {
+      "pantalla": "02 Mis proyectos",
+      "titulo": "Mis proyectos"
+    },
+    {
+      "pantalla": "03 Datos del proyecto",
+      "titulo": "Datos del proyecto"
+    },
+    {
+      "pantalla": "04 Potencial inmobiliario",
+      "titulo": "Potencial inmobiliario"
+    },
+    {
+      "pantalla": "05 Evaluación económica",
+      "titulo": "Evaluación económica"
+    },
+    {
+      "pantalla": "06 Escenarios comparativos",
+      "titulo": "Escenarios comparativos"
+    },
+    {
+      "pantalla": "07 Informes",
+      "titulo": "Informes"
+    },
+    {
+      "pantalla": "08 Biblioteca",
+      "titulo": "Biblioteca"
+    },
+    {
+      "pantalla": "09 Equipo y acceso",
+      "titulo": "Equipo y acceso"
+    },
+    {
+      "pantalla": "10 Configuración",
+      "titulo": "Configuración"
+    }
+  ],
+  "pestanas": [
+    {
+      "pantalla": "03 Datos del proyecto",
+      "pestana": "Terreno",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "03 Datos del proyecto",
+      "pestana": "Edificio",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "03 Datos del proyecto",
+      "pestana": "Parámetros urbanísticos",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "03 Datos del proyecto",
+      "pestana": "Documentos",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "05 Evaluación económica",
+      "pestana": "Supuestos",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "05 Evaluación económica",
+      "pestana": "Ingresos",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "05 Evaluación económica",
+      "pestana": "Egresos",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "05 Evaluación económica",
+      "pestana": "Resultado y observaciones",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "07 Informes",
+      "pestana": "Preparar informe",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "07 Informes",
+      "pestana": "Informes emitidos",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "08 Biblioteca",
+      "pestana": "Edificios",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "08 Biblioteca",
+      "pestana": "Urbanística",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "08 Biblioteca",
+      "pestana": "Economía",
+      "seleccionada": "true"
+    },
+    {
+      "pantalla": "08 Biblioteca",
+      "pestana": "Referencias de suelo",
+      "seleccionada": "true"
+    }
+  ],
+  "comparador": {
+    "maximo": 4,
+    "bloqueoQuintaColumna": true
+  },
+  "escenario": "Selector B refleja propiedad independiente",
+  "dialogo": "Explicación de dúplex abierta y cerrada",
+  "limite": "Revisión de maqueta; sin cálculos, persistencia, cargas de documentos ni PDF funcionales",
+  "camposFinales": {
+    "eficienciaFisica": true,
+    "tarifasObra": 4
+  },
+  "anchosComprobados": [
+    {
+      "viewport": 1265,
+      "scrollWidth": 1265
+    },
+    {
+      "viewport": 402,
+      "scrollWidth": 402
+    }
+  ]
+}
