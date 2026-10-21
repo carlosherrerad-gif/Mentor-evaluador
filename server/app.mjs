@@ -4,6 +4,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openStore } from './store.mjs';
+import { moduleOne } from './module-one.mjs';
 import { token, digest, hashPassword, verifyPassword, sameSecret } from './auth.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -20,10 +21,11 @@ function account(input) {
   if (typeof input.password !== 'string' || input.password.length < 12 || input.password.length > 128) fail(400,'Usa una contraseña de 12 a 128 caracteres.');
   return { name,email,password:input.password };
 }
-async function body(req) {
+async function body(req, limit = 16384) {
   if (!req.headers['content-type']?.startsWith('application/json')) fail(415,'Se requiere JSON.');
-  let raw = '';
-  for await (const chunk of req) { raw += chunk; if (Buffer.byteLength(raw) > 16384) fail(413,'La solicitud es demasiado grande.'); }
+  const chunks=[];let length=0;
+  for await (const chunk of req) {length+=chunk.length;if(length>limit)fail(413,'La solicitud es demasiado grande.');chunks.push(chunk);}
+  const raw=Buffer.concat(chunks).toString('utf8');
   try { const data = JSON.parse(raw); if (!data || typeof data !== 'object' || Array.isArray(data)) throw Error(); return data; }
   catch { fail(400,'La solicitud no es válida.'); }
 }
@@ -42,9 +44,9 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
   const hasUsers = () => Number(db.prepare('SELECT count(*) n FROM users').get().n) > 0;
   const localSetup = !production && ['127.0.0.1','localhost','::1'].includes(host);
   const setupAllowed = Boolean(setupToken) || localSetup;
-  function checkAccess(projectId,user,write = false,admin = false) {
+  function checkAccess(projectId,user,write = false,admin = false,includeDeleted = false) {
     const project = projectFor(projectId,user.id);
-    if (!project) fail(404,'Proyecto no encontrado.');
+    if (!project || (project.deleted_at && !includeDeleted)) fail(404,'Proyecto no encontrado.');
     if ((write && project.role === 'reader') || (admin && project.role !== 'admin')) fail(403,'Tu permiso no permite realizar esta acción.');
     return project;
   }
@@ -146,6 +148,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
         session(res,member); return send(200,{user:publicUser(member),projectId:invite.project_id});
       }
       if (!user) fail(401,'Inicia sesión para continuar.');
+      if (await moduleOne({path,req,user,store,body,text,fail,access:checkAccess,send})) return;
       const memberMatch=path.match(/^\/api\/projects\/([a-f0-9-]{36})\/members\/([a-f0-9-]{36})$/);
       if (memberMatch && req.method==='DELETE') {
         const [,projectId,userId]=memberMatch;
@@ -161,7 +164,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
         return send(200,{ok:true});
       }
       if (path === '/api/projects' && req.method==='GET') {
-        const projects=db.prepare(`SELECT p.*,m.role,(SELECT count(*) FROM scenarios s WHERE s.project_id=p.id) scenario_count,
+        const projects=db.prepare(`SELECT p.*,m.role,(SELECT count(*) FROM scenarios s WHERE s.project_id=p.id AND s.deleted_at IS NULL) scenario_count,
           (SELECT count(*) FROM project_members pm WHERE pm.project_id=p.id) member_count
           FROM projects p JOIN project_members m ON m.project_id=p.id WHERE m.user_id=? ORDER BY p.updated_at DESC`).all(user.id);
         return send(200,{projects});
@@ -172,6 +175,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
         const id=randomUUID(),date=new Date().toISOString();
         transaction(()=>{
           db.prepare('INSERT INTO projects(id,name,code,district,address,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').run(id,name,code,district,address,date,date);
+          db.prepare('UPDATE projects SET region=?,province=?,responsible=?,description=? WHERE id=?').run(text(input.region??'', 'el departamento',120),text(input.province??'', 'la provincia',120),text(input.responsible??'', 'el responsable',120),text(input.description??'', 'la descripción',2000),id);
           db.prepare('INSERT INTO project_members VALUES (?,?,?)').run(id,user.id,'admin');
           db.prepare('INSERT INTO scenarios(id,project_id,name,created_at,updated_at) VALUES (?,?,?,?,?)').run(randomUUID(),id,'Escenario A',date,date);
           history(id,user.id,'project_created',`Proyecto ${name} creado.`);
@@ -192,6 +196,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
           if (!['draft','active','archived'].includes(status)) fail(400,'Estado inválido.');
           if (status!==project.status) checkAccess(id,user,false,true);
           transaction(()=>{
+            db.prepare('UPDATE projects SET region=?,province=?,responsible=?,description=? WHERE id=?').run(text(input.region??project.region,'el departamento',120),text(input.province??project.province,'la provincia',120),text(input.responsible??project.responsible,'el responsable',120),text(input.description??project.description,'la descripción',2000),id);
             const result=db.prepare('UPDATE projects SET name=?,code=?,district=?,address=?,status=?,revision=revision+1,updated_at=? WHERE id=? AND revision=?').run(name,code,district,address,status,new Date().toISOString(),id,input.revision);
             if (!result.changes) fail(409,'El proyecto cambió. Recarga antes de guardar.','REVISION_CONFLICT');
             history(id,user.id,'project_updated',status!==project.status?`Estado cambiado a ${status}.`:'Ficha del proyecto actualizada.');
@@ -220,7 +225,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
           });
           return send(201,{link:`${origin}/?invitacion=${value}`,expiresAt:new Date(expires).toISOString()});
         }
-        if (resource==='history' && req.method==='GET') return send(200,{history:db.prepare(`SELECT h.id,h.action,h.detail,h.created_at,u.name user_name FROM history h JOIN users u ON u.id=h.user_id WHERE project_id=? ORDER BY h.created_at DESC,h.rowid DESC LIMIT 50`).all(id)});
+        if (resource==='history' && req.method==='GET') {const offset=Number(url.searchParams.get('offset')||0);if(!Number.isSafeInteger(offset)||offset<0)fail(400,'Página no válida.');const rows=db.prepare(`SELECT h.id,h.action,h.detail,h.created_at,u.name user_name FROM history h JOIN users u ON u.id=h.user_id WHERE project_id=? ORDER BY h.created_at DESC,h.rowid DESC LIMIT 51 OFFSET ?`).all(id,offset);return send(200,{history:rows.slice(0,50),hasMore:rows.length>50});}
       }
       fail(404,'Recurso no encontrado.');
     } catch (error) {

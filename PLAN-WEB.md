@@ -1,5 +1,7 @@
 # Faseo vigente — Méntor web compartido
 
+Avance 21/10/2026: D2 implementada localmente como Módulo 01, incluyendo la biblioteca versionada adelantada desde D6. Detalle y límites en ESTADO-MODULO-01.md. El comparador y los motores de cálculo siguen pendientes. La siguiente fase se define con el usuario antes de implementarla.
+
 Actualizado el 20/10/2026: primero diseñar y completar V1 localmente; publicar al final. Conserva los siete módulos, las fórmulas auditadas y la arquitectura compartida. Cada entrega se revisa antes de comenzar la siguiente. W1 (base web de acceso y proyectos) es el antecedente ya implementado.
 
 | Fase | Entrega | Criterio de cierre |
