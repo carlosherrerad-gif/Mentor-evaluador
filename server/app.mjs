@@ -4,6 +4,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openStore } from './store.mjs';
+import {landRoutes} from './land.mjs';
 import { moduleOne } from './module-one.mjs';
 import { token, digest, hashPassword, verifyPassword, sameSecret } from './auth.mjs';
 
@@ -148,6 +149,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
         session(res,member); return send(200,{user:publicUser(member),projectId:invite.project_id});
       }
       if (!user) fail(401,'Inicia sesión para continuar.');
+      if (await landRoutes({path,req,user,store,body,text,fail,access:checkAccess,send})) return;
       if (await moduleOne({path,req,user,store,body,text,fail,access:checkAccess,send})) return;
       const memberMatch=path.match(/^\/api\/projects\/([a-f0-9-]{36})\/members\/([a-f0-9-]{36})$/);
       if (memberMatch && req.method==='DELETE') {
@@ -192,6 +194,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
           const input=await body(req);
           if (input.revision!==project.revision) fail(409,'Otra persona modificó este proyecto. Actualiza los datos antes de guardar.','REVISION_CONFLICT');
           const name=text(input.name ?? project.name,'el nombre',120,true),code=text(input.code ?? project.code,'el código',40),district=text(input.district ?? project.district,'el distrito',120),address=text(input.address ?? project.address,'la dirección',240);
+          if(['district','address','region','province'].some(k=>input[k]!==undefined&&input[k]!==project[k])) checkAccess(id,user,false,true);
           const status=input.status ?? project.status;
           if (!['draft','active','archived'].includes(status)) fail(400,'Estado inválido.');
           if (status!==project.status) checkAccess(id,user,false,true);

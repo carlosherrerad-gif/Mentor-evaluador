@@ -56,6 +56,7 @@ export function openStore(filename) {
     };
     for (const name of ['region','province','responsible','description']) add('projects',name,"TEXT NOT NULL DEFAULT ''");
     add('projects','deleted_at','TEXT');
+    add('projects','land_json',"TEXT NOT NULL DEFAULT '{}'");
     add('projects','urban_config_json',"TEXT NOT NULL DEFAULT '{}'");
     add('scenarios','status',"TEXT NOT NULL DEFAULT 'active'");
     add('scenarios','deleted_at','TEXT');
@@ -71,7 +72,12 @@ export function openStore(filename) {
       config_json TEXT NOT NULL, note TEXT NOT NULL, created_at TEXT NOT NULL,
       PRIMARY KEY(template_id,version)
     ) STRICT;
-    INSERT OR IGNORE INTO schema_migrations VALUES (2);`);
+    CREATE TABLE IF NOT EXISTS market_references (
+      id TEXT PRIMARY KEY, owner_id TEXT NOT NULL REFERENCES users(id), previous_id TEXT REFERENCES market_references(id),
+      version INTEGER NOT NULL, data_json TEXT NOT NULL, created_at TEXT NOT NULL, archived INTEGER NOT NULL DEFAULT 0
+    ) STRICT;
+    INSERT OR IGNORE INTO schema_migrations VALUES (2);
+    INSERT OR IGNORE INTO schema_migrations VALUES (3);`);
     db.exec('COMMIT');
   } catch(error) { db.exec('ROLLBACK');db.close();throw error; }
   function transaction(work) {

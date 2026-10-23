@@ -112,6 +112,6 @@ test('migración aditiva conserva registros de la base anterior y puede reabrirs
   try {
     const old=new DatabaseSync(file);old.exec(`CREATE TABLE projects(id TEXT PRIMARY KEY,name TEXT NOT NULL,code TEXT NOT NULL DEFAULT '',district TEXT NOT NULL DEFAULT '',address TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'draft',revision INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL,updated_at TEXT NOT NULL) STRICT; INSERT INTO projects VALUES ('legacy','Proyecto anterior','','','','draft',1,'2026-01-01','2026-01-01');`);old.close();
     let store=openStore(file);let row=store.db.prepare('SELECT * FROM projects WHERE id=?').get('legacy');assert.equal(row.name,'Proyecto anterior');assert.equal(row.deleted_at,null);assert.equal(row.description,'');store.close();
-    store=openStore(file);assert.equal(store.db.prepare('SELECT count(*) n FROM projects').get().n,1);assert.equal(store.db.prepare('SELECT max(version) version FROM schema_migrations').get().version,2);store.close();
+    store=openStore(file);assert.equal(store.db.prepare('SELECT count(*) n FROM projects').get().n,1);assert.equal(store.db.prepare('SELECT max(version) version FROM schema_migrations').get().version,3);store.close();
   } finally {assert.ok(dir.startsWith(root+sep));await rm(dir,{recursive:true,force:true});}
 });

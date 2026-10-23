@@ -1,3 +1,4 @@
+import {validateLand,validateAcquisition} from './land.mjs';
 import {randomUUID} from 'node:crypto';
 
 const idPattern='[a-f0-9-]{36}';
@@ -18,9 +19,10 @@ export async function moduleOne(ctx) {
     db.prepare(`INSERT INTO scenarios(id,project_id,name,created_at,updated_at,status,configuration_json,economics_json,source_template_json) VALUES (?,?,?,?,?,?,?,?,?)`).run(id,projectId,name,now,now,source.status || 'active',source.configuration_json||'{}',source.economics_json||'{}',source.source_template_json||null);
     return db.prepare('SELECT * FROM scenarios WHERE id=?').get(id);
   }
-  function insertProject(input,urban='{}') {
+  function insertProject(input,urban='{}',land='{}') {
     const m=metadata(input),id=randomUUID(),now=stamp();
     db.prepare(`INSERT INTO projects(id,name,code,district,address,region,province,responsible,description,urban_config_json,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(id,m.name,m.code,m.district,m.address,m.region,m.province,m.responsible,m.description,urban,input.status==='active'?'active':'draft',now,now);
+    db.prepare('UPDATE projects SET land_json=? WHERE id=?').run(land,id);
     db.prepare('INSERT INTO project_members VALUES (?,?,?)').run(id,user.id,'admin');return id;
   }
   const projectAction=path.match(new RegExp(`^/api/projects/(${idPattern})/(duplicate|trash|recover|export)$`));
@@ -30,7 +32,7 @@ export async function moduleOne(ctx) {
     if(action==='export'&&req.method==='GET') {
       const fields=metadata(p);
       const scenarios=db.prepare('SELECT * FROM scenarios WHERE project_id=? AND deleted_at IS NULL ORDER BY created_at,id').all(id);
-      send(200,{backup:{format:'mentor-project',version:1,exportedAt:stamp(),project:{...fields,status:p.status,urban:decode(p.urban_config_json)},scenarios:scenarios.map(s=>({name:s.name,status:s.status,configuration:decode(s.configuration_json),economics:decode(s.economics_json),source:s.source_template_json?decode(s.source_template_json):null}))},scope:'Datos del proyecto y configuraciones aplicadas. No incluye cuentas, biblioteca global ni archivos documentales.'});return true;
+      send(200,{backup:{format:'mentor-project',version:1,exportedAt:stamp(),project:{...fields,status:p.status,urban:decode(p.urban_config_json),land:decode(p.land_json)},scenarios:scenarios.map(s=>({name:s.name,status:s.status,configuration:decode(s.configuration_json),economics:decode(s.economics_json),source:s.source_template_json?decode(s.source_template_json):null}))},scope:'Datos del proyecto y configuraciones aplicadas. No incluye cuentas, biblioteca global ni archivos documentales.'});return true;
     }
     if(req.method!=='POST')fail(405,'Método no permitido.');
     const input=await body(req);revision(input.revision,p.revision);
@@ -39,7 +41,7 @@ export async function moduleOne(ctx) {
       const name=text(input.name,'el nombre de la copia',120,true);
       const copied=transaction(()=>{
         revision(input.revision,projectFor(id,user.id).revision);
-        const target=insertProject({...p,name,code:'',status:'draft'},p.urban_config_json);
+        const target=insertProject({...p,name,code:'',status:'draft'},p.urban_config_json,p.land_json);
         if(input.includeScenarios!==false)for(const s of db.prepare('SELECT * FROM scenarios WHERE project_id=? AND deleted_at IS NULL').all(id))copyScenario(s,target,s.name);
         if(!db.prepare('SELECT 1 FROM scenarios WHERE project_id=?').get(target))copyScenario({},target,'Escenario A');
         history(target,user.id,'project_duplicated',`Copia independiente de ${p.name}. Los accesos no se copiaron.`);return target;
@@ -57,11 +59,12 @@ export async function moduleOne(ctx) {
     const input=await body(req,2_000_000),b=input.backup;
     if(!b||b.format!=='mentor-project'||b.version!==1||!b.project||!Array.isArray(b.scenarios))fail(400,'El archivo no es un respaldo de datos de Méntor V1.');
     const fields=metadata({...b.project,name:input.name||b.project.name});
+    const land=JSON.stringify(validateLand(b.project.land||{},fail));
     const urban=json(b.project.urban || {},'la referencia urbanística');
     const scenarios=b.scenarios.map(s=>({name:text(s.name,'el escenario',100,true),status:s.status==='archived'?'archived':'active',configuration_json:json(s.configuration||{},'la configuración'),economics_json:json(s.economics||{},'los supuestos'),source_template_json:s.source?json(s.source,'la procedencia'):null}));
     const id=transaction(()=>{
-      const target=insertProject({...fields,status:'draft'},urban);
-      for(const s of scenarios)copyScenario(s,target,s.name);
+      const target=insertProject({...fields,status:'draft'},urban,land);
+      for(const s of scenarios){const e=decode(s.economics_json);if(e.acquisition)e.acquisition=validateAcquisition(e.acquisition,fail);copyScenario({...s,economics_json:JSON.stringify(e)},target,s.name);}
       if(!scenarios.length)copyScenario({},target,'Escenario A');
       history(target,user.id,'project_imported','Datos recuperados desde un respaldo como proyecto nuevo. No se sobrescribió ningún proyecto existente.');return target;
     });send(201,{project:projectFor(id,user.id)});return true;
@@ -92,6 +95,7 @@ export async function moduleOne(ctx) {
       const name=text(input.name??s.name,'el nombre del escenario',100,true),status=input.status??s.status;
       if(!['active','archived'].includes(status))fail(400,'Estado de escenario inválido.');
       const config=input.configuration===undefined?s.configuration_json:json(input.configuration,'la configuración');
+      if(input.economics?.acquisition)input.economics.acquisition=validateAcquisition(input.economics.acquisition,fail);
       const economics=input.economics===undefined?s.economics_json:json(input.economics,'los supuestos');
       transaction(()=>{
         revision(input.revision,db.prepare('SELECT revision FROM scenarios WHERE id=?').get(s.id).revision);
