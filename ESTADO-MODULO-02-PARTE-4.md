@@ -1,5 +1,15 @@
 # Módulo 02 · Parte 4 — Registro de parámetros urbanísticos
 
+## Ajuste posterior — Parámetros simples y zonificación
+
+La vista principal ahora contiene distrito, zonificación, pisos máximos, área libre mínima y regla de estacionamientos con su cantidad aplicable. El resto se conserva en Datos adicionales y Fuente/observaciones, ambos opcionales y desplegables. Azotea se ofrece como bloque cuando algún escenario la utiliza o ya existen valores registrados; también permanece accesible entre los datos adicionales en los demás casos. Las plantillas utilizan el mismo formulario reducido.
+
+Zonificación dispone de catálogo inicial con búsqueda por código/descripción, selección con teclado y Otra zonificación para códigos propios. No se reemplazan valores anteriores ni se asignan restricciones al seleccionar un código. El catálogo no certifica aplicabilidad por distrito ni representa una clasificación por frecuencia de uso.
+
+Referencias de nomenclatura: [capa IMP/MINAM](https://geoservidorperu.minam.gob.pe/arcgis/rest/services/GEOLOMAS_final/MapServer/13) y [nomenclatura publicada en El Peruano](https://busquedas.elperuano.pe/dispositivo/NL/1751229-3). Solo se reutilizan códigos/nombres; no parámetros numéricos de esas fuentes.
+
+Validación del ajuste: compilación correcta y recorrido visual en base sintética. Búsqueda por descripción y código, selección con Enter, código propio conservado al recargar y selección dentro de un formulario de plantilla sin guardado accidental. Cambiar zonificación conservó 10 pisos, 35 % de área libre y la altura anterior de 36 m accesible en datos adicionales. Sin errores de consola ni desbordamiento horizontal general en la vista revisada. No se modificaron rutas ni cálculos del servidor.
+
 Entrega local en Datos del proyecto → Parámetros. Diseño compacto con grupos desplegables. Se conserva la biblioteca anterior y las configuraciones de proyectos existentes.
 
 ## Registro del terreno
