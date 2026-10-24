@@ -1,3 +1,4 @@
+import {validateUrban,urbanConfig} from '../shared/urban.mjs';
 import {validateBuilding,buildingFrom} from '../shared/building.mjs';
 import {validateLand,validateAcquisition} from './land.mjs';
 import {randomUUID} from 'node:crypto';
@@ -61,7 +62,7 @@ export async function moduleOne(ctx) {
     if(!b||b.format!=='mentor-project'||b.version!==1||!b.project||!Array.isArray(b.scenarios))fail(400,'El archivo no es un respaldo de datos de Méntor V1.');
     const fields=metadata({...b.project,name:input.name||b.project.name});
     const land=JSON.stringify(validateLand(b.project.land||{},fail));
-    const urban=json(b.project.urban || {},'la referencia urbanística');
+    const rawUrban=b.project.urban||{};const urban=json(Object.keys(rawUrban).length?urbanConfig(rawUrban,fail):{},'la referencia urbanística');
     const scenarios=b.scenarios.map(s=>({name:text(s.name,'el escenario',100,true),status:s.status==='archived'?'archived':'active',configuration_json:json(s.configuration||{},'la configuración'),economics_json:json(s.economics||{},'los supuestos'),source_template_json:s.source?json(s.source,'la procedencia'):null}));
     const id=transaction(()=>{
       const target=insertProject({...fields,status:'draft'},urban,land);
@@ -108,6 +109,7 @@ export async function moduleOne(ctx) {
     fail(405,'Método no permitido.');
   }
   function configData(category,input) {
+    if(category==='urban')return validateUrban(input,fail);
     const numeric=category==='building'?['floors','basements','unitsPerFloor','floorHeight','elevators','efficiency']:['maxFloors','minFreeArea','frontSetback','sideSetback','density','coefficient'];
     const strings=category==='building'?['buildingType','parkingSystem','notes']:['district','zoning','parkingRule','source','verifiedDate','notes'];
     const value={};

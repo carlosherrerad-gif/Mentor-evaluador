@@ -1,3 +1,4 @@
+import {urbanRoutes} from './urban.mjs';
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
@@ -150,6 +151,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
         session(res,member); return send(200,{user:publicUser(member),projectId:invite.project_id});
       }
       if (!user) fail(401,'Inicia sesión para continuar.');
+      if (await urbanRoutes({path,req,user,store,body,text,fail,access:checkAccess,send})) return;
       if (await buildingRoutes({path,req,user,store,body,text,fail,access:checkAccess,send})) return;
       if (await landRoutes({path,req,user,store,body,text,fail,access:checkAccess,send})) return;
       if (await moduleOne({path,req,user,store,body,text,fail,access:checkAccess,send})) return;
