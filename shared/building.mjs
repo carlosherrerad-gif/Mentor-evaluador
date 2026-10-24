@@ -1,6 +1,7 @@
+import {extraFrom,validateExtra,extraSummary} from './building-extra.mjs';
 // Motor único de áreas sobre el terreno. Sin valores normativos predeterminados.
 export function buildingFrom(config={}) {
-  return {floors:config.floors??null,unitsPerFloor:config.unitsPerFloor??null,floorHeight:config.floorHeight??null,occupancy:null,efficiency:config.efficiency??null,constructedMode:'auto',saleMode:'auto',constructed:null,sale:null,specials:[],notes:'',manualAreaReference:null,...config.buildingBase};
+  return {floors:config.floors??null,unitsPerFloor:config.unitsPerFloor??null,floorHeight:config.floorHeight??null,occupancy:null,efficiency:config.efficiency??null,constructedMode:'auto',saleMode:'auto',constructed:null,sale:null,specials:[],notes:'',manualAreaReference:null,...config.buildingBase,extensions:extraFrom(config.buildingBase?.extensions,config)};
 }
 function areaFor(row,model,area){
   const constructed=row.constructedMode==='manual'?row.constructed:(area!=null&&model.occupancy!=null?area*model.occupancy/100:null);
@@ -30,13 +31,13 @@ export function validateBuilding(input,fail,area=null){
     for(const key of ['constructedMode','saleMode'])if(v[key]!==undefined&&!['auto','manual'].includes(v[key]))reject('Modo de área inválido.');
     return {unitsPerFloor:number(v.unitsPerFloor,'departamentos',10000,true),floorHeight:number(v.floorHeight,'altura',100,false,true),efficiency:number(v.efficiency,'eficiencia',100),constructedMode:v.constructedMode??'auto',saleMode:v.saleMode??'auto',constructed:number(v.constructed,'área construida'),sale:number(v.sale,'área vendible')};
   };
-  const model={...row(input),floors:number(input.floors,'pisos (1 a 200)',200,true,true),occupancy:number(input.occupancy,'ocupación',100),specials:[],notes:input.notes??'',manualAreaReference:number(input.manualAreaReference,'área de referencia')};
+  const model={...row(input),floors:number(input.floors,'pisos (1 a 200)',200,true,true),occupancy:number(input.occupancy,'ocupación',100),extensions:validateExtra(input.extensions,fail),specials:[],notes:input.notes??'',manualAreaReference:number(input.manualAreaReference,'área de referencia')};
   if(typeof model.notes!=='string'||model.notes.length>2000)reject('Observaciones demasiado largas.');
   if(input.specials!==undefined&&!Array.isArray(input.specials))reject('Pisos especiales inválidos.');
   if((input.specials||[]).length>200)reject('Demasiados pisos especiales.');
   const seen=new Set();
   for(const s of input.specials||[]){const floor=number(s?.floor,'piso especial',200,true,true);if(floor===null||model.floors===null||floor>model.floors||seen.has(floor))reject('Los pisos especiales deben ser únicos y estar dentro del edificio.');seen.add(floor);model.specials.push({...row(s),floor});}
   model.specials.sort((a,b)=>a.floor-b.floor);
-  const result=buildingSummary(model,area);if(result.errors.length)reject(result.errors[0]);
+  const result=buildingSummary(model,area);if(result.errors.length)reject(result.errors[0]);const extra=extraSummary(model.extensions,area,result);if(extra.errors.length)reject(extra.errors[0]);
   return model;
 }

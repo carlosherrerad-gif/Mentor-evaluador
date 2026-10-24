@@ -1,4 +1,4 @@
-import {validateBuilding} from '../shared/building.mjs';
+import {validateBuilding,buildingFrom} from '../shared/building.mjs';
 import {validateLand,validateAcquisition} from './land.mjs';
 import {randomUUID} from 'node:crypto';
 
@@ -65,7 +65,7 @@ export async function moduleOne(ctx) {
     const scenarios=b.scenarios.map(s=>({name:text(s.name,'el escenario',100,true),status:s.status==='archived'?'archived':'active',configuration_json:json(s.configuration||{},'la configuración'),economics_json:json(s.economics||{},'los supuestos'),source_template_json:s.source?json(s.source,'la procedencia'):null}));
     const id=transaction(()=>{
       const target=insertProject({...fields,status:'draft'},urban,land);
-      for(const s of scenarios){const e=decode(s.economics_json);const config=decode(s.configuration_json);if(config.buildingBase){config.buildingBase=validateBuilding(config.buildingBase,fail,JSON.parse(land).area??null);s.configuration_json=JSON.stringify(config);}if(e.acquisition)e.acquisition=validateAcquisition(e.acquisition,fail);copyScenario({...s,economics_json:JSON.stringify(e)},target,s.name);}
+      for(const s of scenarios){const e=decode(s.economics_json);const config=decode(s.configuration_json);if(config.buildingBase){config.buildingBase=validateBuilding(buildingFrom(config),fail,JSON.parse(land).area??null);s.configuration_json=JSON.stringify(config);}if(e.acquisition)e.acquisition=validateAcquisition(e.acquisition,fail);copyScenario({...s,economics_json:JSON.stringify(e)},target,s.name);}
       if(!scenarios.length)copyScenario({},target,'Escenario A');
       history(target,user.id,'project_imported','Datos recuperados desde un respaldo como proyecto nuevo. No se sobrescribió ningún proyecto existente.');return target;
     });send(201,{project:projectFor(id,user.id)});return true;
@@ -95,7 +95,7 @@ export async function moduleOne(ctx) {
       if(s.deleted_at)fail(409,'Recupera el escenario para editarlo.');
       const name=text(input.name??s.name,'el nombre del escenario',100,true),status=input.status??s.status;
       if(!['active','archived'].includes(status))fail(400,'Estado de escenario inválido.');
-      if(input.configuration?.buildingBase)input.configuration.buildingBase=validateBuilding(input.configuration.buildingBase,fail,JSON.parse(projectFor(projectId,user.id).land_json).area??null);
+      if(input.configuration?.buildingBase)input.configuration.buildingBase=validateBuilding(buildingFrom(input.configuration),fail,JSON.parse(projectFor(projectId,user.id).land_json).area??null);
       const config=input.configuration===undefined?s.configuration_json:json(input.configuration,'la configuración');
       if(input.economics?.acquisition)input.economics.acquisition=validateAcquisition(input.economics.acquisition,fail);
       const economics=input.economics===undefined?s.economics_json:json(input.economics,'los supuestos');
@@ -120,7 +120,7 @@ export async function moduleOne(ctx) {
       value[key]=raw;
     }
     for(const key of strings)value[key]=text(input[key]??'',key,key==='notes'?2000:500);
-    if(category==='building'&&input.buildingBase){value.buildingBase=validateBuilding(input.buildingBase,fail);for(const key of ['floors','unitsPerFloor','floorHeight','efficiency'])value[key]=value.buildingBase[key];}
+    if(category==='building'&&input.buildingBase){value.buildingBase=validateBuilding(buildingFrom(input),fail);for(const key of ['floors','unitsPerFloor','floorHeight','efficiency'])value[key]=value.buildingBase[key];value.basements=value.buildingBase.extensions.basements.length;value.elevators=value.buildingBase.extensions.elevators;}
     return value;
   }
   const templateQuery=`SELECT t.*,v.version,v.config_json,v.note,v.created_at version_date,u.name author FROM templates t JOIN template_versions v ON v.template_id=t.id JOIN users u ON u.id=t.owner_id WHERE v.version=(SELECT max(x.version) FROM template_versions x WHERE x.template_id=t.id)`;
@@ -146,7 +146,7 @@ export async function moduleOne(ctx) {
       if(t.category==='building') {
         const s=db.prepare('SELECT * FROM scenarios WHERE id=? AND project_id=? AND deleted_at IS NULL').get(input.scenarioId,p.id);
         if(!s)fail(404,'Escenario no encontrado.');revision(input.revision,s.revision);
-        transaction(()=>{revision(input.revision,db.prepare('SELECT revision FROM scenarios WHERE id=?').get(s.id).revision);const copy=decode(v.config_json);if(copy.buildingBase)copy.buildingBase=validateBuilding(copy.buildingBase,fail,decode(projectFor(p.id,user.id).land_json).area??null);db.prepare('UPDATE scenarios SET configuration_json=?,source_template_json=?,revision=revision+1,updated_at=? WHERE id=?').run(JSON.stringify(copy),JSON.stringify(source),stamp(),s.id);touch(p.id);history(p.id,user.id,'building_template_applied',`${t.name} V${version} aplicada como copia independiente a ${s.name}. Áreas y resultados pendientes de cálculo.`);});
+        transaction(()=>{revision(input.revision,db.prepare('SELECT revision FROM scenarios WHERE id=?').get(s.id).revision);const copy=decode(v.config_json);if(copy.buildingBase)copy.buildingBase=validateBuilding(buildingFrom(copy),fail,decode(projectFor(p.id,user.id).land_json).area??null);db.prepare('UPDATE scenarios SET configuration_json=?,source_template_json=?,revision=revision+1,updated_at=? WHERE id=?').run(JSON.stringify(copy),JSON.stringify(source),stamp(),s.id);touch(p.id);history(p.id,user.id,'building_template_applied',`${t.name} V${version} aplicada como copia independiente a ${s.name}. Áreas y resultados pendientes de cálculo.`);});
       } else {
         access(p.id,user,false,true);revision(input.revision,p.revision);
         const copied={...decode(v.config_json),sourceTemplate:source,verification:'pending'};

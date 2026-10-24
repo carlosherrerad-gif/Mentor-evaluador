@@ -1,0 +1,7 @@
+import type {Building} from './building.mjs';
+export type Basement={mode:'auto'|'manual';occupancy:number|null;area:number|null;height:number|null};
+export type Extra={basements:Basement[];parking:{enabled:boolean;mode:'manual'|'estimate';manual:number|null;area:number|null;perSpace:number|null;commercial:number|null};roof:{enabled:boolean;baseArea:number|null;duplexBuilt:number|null;duplexSale:number|null;commonBuilt:number|null;servicesBuilt:number|null;terraces:number|null;height:number|null;useStatus:'pending'|'supported';source:string};duplex:{enabled:boolean;connection:'floors'|'roof';count:number|null;built:number|null;sale:number|null};elevators:number|null;areaReference:number|null};
+export function emptyBasement():Basement;
+export function extraFrom(value?:Partial<Extra>,legacy?:Record<string,unknown>):Extra;
+export function validateExtra(value:unknown,fail:(status:number,message:string)=>never):Extra;
+export function extraSummary(e:Extra,area:number|null,base:ReturnType<typeof import('./building.mjs').buildingSummary>):{basementRows:{level:number;mode:string;area:number|null;height:number|null}[];basements:number|null;roofBuilt:number|null;roofSale:number|null;supportedSale:number|null;hypotheticalSale:number|null;roofFree:number|null;parking:number|null;commercial:number|null;duplexCount:number|null;flats:number|null;units:number|null;constructed:number|null;sale:number|null;height:number|null;originFloor:number|null;targetFloor:number|null;manualReview:boolean;errors:string[];warnings:string[];complete:boolean};

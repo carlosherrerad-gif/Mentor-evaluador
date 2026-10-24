@@ -10,7 +10,7 @@ export async function buildingRoutes({path,req,user,store,body,fail,access,send}
     if(!s)fail(404,'Escenario no encontrado.');if(s.status==='archived')fail(409,'Recupera el escenario antes de editarlo.');
     const p=projectFor(pid,user.id);if(s.revision!==input.revision||p.revision!==input.projectRevision)fail(409,'El escenario o el terreno cambió. Conserva tu borrador y carga la versión actual antes de guardar.','REVISION_CONFLICT');
     const area=JSON.parse(p.land_json).area??null,model=validateBuilding(input.building,fail,area),config=JSON.parse(s.configuration_json);
-    config.buildingBase=model;config.floors=model.floors;config.unitsPerFloor=model.unitsPerFloor;config.floorHeight=model.floorHeight;config.efficiency=model.efficiency;config.buildingType='Multifamiliar';
+    config.buildingBase=model;config.floors=model.floors;config.unitsPerFloor=model.unitsPerFloor;config.floorHeight=model.floorHeight;config.efficiency=model.efficiency;config.buildingType='Multifamiliar';config.basements=model.extensions.basements.length;config.elevators=model.extensions.elevators;
     const economics=JSON.parse(s.economics_json);economics.buildingReview={pending:true,reason:'Configuración del edificio modificada',at:now};
     db.prepare('UPDATE scenarios SET configuration_json=?,economics_json=?,revision=revision+1,updated_at=? WHERE id=?').run(JSON.stringify(config),JSON.stringify(economics),now,sid);
     db.prepare('UPDATE projects SET revision=revision+1,updated_at=? WHERE id=?').run(now,pid);
