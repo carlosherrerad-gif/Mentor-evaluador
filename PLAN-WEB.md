@@ -21,3 +21,7 @@ Actualizado el 20/10/2026: primero diseñar y completar V1 localmente; publicar 
 La referencia PEDelta orienta navegación, filtros, paneles y jerarquía visual. No se copian sus datos, identidad ni funciones ajenas al evaluador inmobiliario. La primera vista previa utiliza el servidor de este equipo: todavía no equivale a acceso público por internet.
 
 La propuesta de D1 está en docs/DISENO-INTEGRAL-V1.md y en /diseno-v1.html. Ver ADR-002 para el cambio de orden. La maqueta no guarda ni calcula y todavía requiere revisión.
+
+
+### Vista conceptual 3D · entrega local 24/10/2026
+Implementada en Potencial inmobiliario: fachada automática por ancho, retiros gráficos del 10 % en uno o dos frentes, ventanas/balcones, firma discreta Méntor, giro, acercamiento, selección de pisos, sótanos y azotea ocultables, modo arquitectónico y análisis. Geometría rectangular referencial independiente de áreas económicas y normativas. Expediente y adjuntos siguen pospuestos. Evaluación económica pendiente de esquema aprobado.
