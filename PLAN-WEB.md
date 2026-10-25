@@ -25,3 +25,7 @@ La propuesta de D1 está en docs/DISENO-INTEGRAL-V1.md y en /diseno-v1.html. Ver
 
 ### Vista conceptual 3D · entrega local 24/10/2026
 Implementada en Potencial inmobiliario: fachada automática por ancho, retiros gráficos del 10 % en uno o dos frentes, ventanas/balcones, firma discreta Méntor, giro, acercamiento, selección de pisos, sótanos y azotea ocultables, modo arquitectónico y análisis. Geometría rectangular referencial independiente de áreas económicas y normativas. Expediente y adjuntos siguen pospuestos. Evaluación económica pendiente de esquema aprobado.
+
+
+### Evaluación económica · entrega 1 · 25/10/2026
+Implementada evaluación estática rápida/detallada por escenario: ingresos, costos contratados y propios de la inmobiliaria, resultado preliminar antes de IR, hipótesis separada y guardado con revisiones. No liquida IGV ni calcula IR. Próxima entrega: esquema aprobado de cronograma y flujo mensual; después financiamiento y sensibilidad. Ver ESTADO-EVALUACION-ECONOMICA-1.md.

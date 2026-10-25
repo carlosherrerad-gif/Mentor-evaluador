@@ -1,0 +1,12 @@
+import type {Potential} from './potential.mjs';
+export type Basis='fixed'|'floors'|'basements'|'roof'|'built'|'units'|'parking'|'months'|'sales'|'construction'|'land';
+export type Part={name:string;basis:Basis;amount:number|null;months:number|null};
+export type Cost={status:'pending'|'active'|'na'|'included';mode:'quick'|'detail'|'rates';basis:Basis;amount:number|null;months:number|null;floors:number|null;basements:number|null;roof:number|null;items:Part[];note:string};
+export type Evaluation={currency:'PEN'|'USD';fx:number|null;taxBasis:'pending'|'included'|'excluded';salesPrice:number|null;parkingPrice:number|null;hypothesisPrice:number|null;priceGroups:{from:number|null;to:number|null;price:number|null}[];otherIncome:{name:string;amount:number|null}[];costs:Record<string,Cost>;reviewKey:string;notes:string};
+export const costGroups:string[][];
+export const bases:string[][];
+export function emptyCost():Cost;
+export function validateEvaluation(value?:unknown,fail?:(status:number,message:string)=>never):Evaluation;
+export function evaluationFrom(economics?:Record<string,unknown>):Evaluation;
+export type EconomicResult={evaluation:Evaluation;physical:Potential;reviewKey:string;manualReview:boolean;floorSales:{floor:number;area:number|null;price:number|null;amount:number|null;detail:boolean}[];revenues:{residential:number|null;parking:number|null;others:number|null;total:number|null;hypothesis:number|null};landCost:number|null;categories:{key:string;label:string;total:number|null;parts:{name:string;basis:Basis;quantity:number|null;price:number|null;amount:number|null}[]}[];cost:number|null;profit:number|null;returnOnCost:number|null;margin:number|null;hypothesisProfit:number|null;hypothesisCost:number|null;pending:string[];warnings:string[];complete:boolean};
+export function economicSummary(input?:{configuration?:Record<string,unknown>;land?:Record<string,unknown>;urban?:Record<string,unknown>;district?:string;economics?:Record<string,unknown>;evaluation?:Evaluation;today?:string}):EconomicResult;

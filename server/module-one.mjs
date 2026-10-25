@@ -1,3 +1,4 @@
+import {validateEvaluation} from '../shared/economics.mjs';
 import {validateUrban,urbanConfig} from '../shared/urban.mjs';
 import {validateBuilding,buildingFrom} from '../shared/building.mjs';
 import {validateLand,validateAcquisition} from './land.mjs';
@@ -66,7 +67,7 @@ export async function moduleOne(ctx) {
     const scenarios=b.scenarios.map(s=>({name:text(s.name,'el escenario',100,true),status:s.status==='archived'?'archived':'active',configuration_json:json(s.configuration||{},'la configuración'),economics_json:json(s.economics||{},'los supuestos'),source_template_json:s.source?json(s.source,'la procedencia'):null}));
     const id=transaction(()=>{
       const target=insertProject({...fields,status:'draft'},urban,land);
-      for(const s of scenarios){const e=decode(s.economics_json);const config=decode(s.configuration_json);if(config.buildingBase){config.buildingBase=validateBuilding(buildingFrom(config),fail,JSON.parse(land).area??null);s.configuration_json=JSON.stringify(config);}if(e.acquisition)e.acquisition=validateAcquisition(e.acquisition,fail);copyScenario({...s,economics_json:JSON.stringify(e)},target,s.name);}
+      for(const s of scenarios){const e=decode(s.economics_json);const config=decode(s.configuration_json);if(config.buildingBase){config.buildingBase=validateBuilding(buildingFrom(config),fail,JSON.parse(land).area??null);s.configuration_json=JSON.stringify(config);}if(e.acquisition)e.acquisition=validateAcquisition(e.acquisition,fail);if(e.evaluation)e.evaluation=validateEvaluation(e.evaluation,fail);copyScenario({...s,economics_json:JSON.stringify(e)},target,s.name);}
       if(!scenarios.length)copyScenario({},target,'Escenario A');
       history(target,user.id,'project_imported','Datos recuperados desde un respaldo como proyecto nuevo. No se sobrescribió ningún proyecto existente.');return target;
     });send(201,{project:projectFor(id,user.id)});return true;
@@ -99,6 +100,7 @@ export async function moduleOne(ctx) {
       if(input.configuration?.buildingBase)input.configuration.buildingBase=validateBuilding(buildingFrom(input.configuration),fail,JSON.parse(projectFor(projectId,user.id).land_json).area??null);
       const config=input.configuration===undefined?s.configuration_json:json(input.configuration,'la configuración');
       if(input.economics?.acquisition)input.economics.acquisition=validateAcquisition(input.economics.acquisition,fail);
+      if(input.economics?.evaluation)input.economics.evaluation=validateEvaluation(input.economics.evaluation,fail);
       const economics=input.economics===undefined?s.economics_json:json(input.economics,'los supuestos');
       transaction(()=>{
         revision(input.revision,db.prepare('SELECT revision FROM scenarios WHERE id=?').get(s.id).revision);
