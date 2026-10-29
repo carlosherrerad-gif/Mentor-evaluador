@@ -29,3 +29,7 @@ Implementada en Potencial inmobiliario: fachada automática por ancho, retiros g
 
 ### Evaluación económica · entrega 1 · 25/10/2026
 Implementada evaluación estática rápida/detallada por escenario: ingresos, costos contratados y propios de la inmobiliaria, resultado preliminar antes de IR, hipótesis separada y guardado con revisiones. No liquida IGV ni calcula IR. Próxima entrega: esquema aprobado de cronograma y flujo mensual; después financiamiento y sensibilidad. Ver ESTADO-EVALUACION-ECONOMICA-1.md.
+
+
+### Flujo de caja independiente · 28/10/2026
+Sección propia en el menú, disponible para todos los equipos con los permisos existentes. La segmentación Básico/Premium, activación por equipo y cobros se definirán al cerrar el alcance; no se implementa gating ahora. Incluye propuesta automática de cronograma por inventario, velocidad y meta de preventa; inicio de obra después de preventa/preparación, duración general editable y pagos uniformes; cobranzas, pagos y flujo mensual conciliado. Los ajustes manuales se conservan. No cambia el presupuesto del módulo económico. Pendientes posteriores: curva variable opcional de obra, financiamiento por deuda/aportes, impuestos, VAN/TIR y sensibilidad. Ver ESTADO-FLUJO-CAJA-1.md.

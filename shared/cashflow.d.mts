@@ -1,0 +1,15 @@
+import type {EconomicResult} from './economics.mjs';
+export type StageSetting={mode:'auto'|'manual'|'na';start:number|null;duration:number|null};
+export type PaymentSetting={mode:'auto'|'manual';start:number|null;duration:number|null};
+export type Cashflow={startMonth:string;velocity:number|null;presalePercent:number|null;constructionMonths:number|null;stages:Record<string,StageSetting>;payments:Record<string,PaymentSetting>;collections:{mode:'sale'|'split';initialPercent:number|null;lag:number|null};otherIncomeMonth:number|null;manualReference:string;notes:string};
+export type Stage={key:string;label:string;mode:StageSetting['mode'];start:number|null;duration:number|null;end:number|null};
+export type PaymentRow={key:string;label:string;total:number|null;cash:number|null;nonCash:boolean;mode:'auto'|'manual';start:number|null;duration:number|null;end:number|null};
+export type CashMonth={month:number;label:string;presales:number;sales:number;parking:number;residential:number;parkingIncome:number;otherIncome:number;incomeRounding:number;payments:Record<string,number>;costRounding:number;income:number;cost:number;net:number;cumulative:number};
+export type CashResult={settings:Cashflow;economic:EconomicResult;stages:Stage[];paymentRows:PaymentRow[];reference:string;units:number|null;presaleTarget:number|null;salesMonths:number|null;preMonths:number|null;months:CashMonth[];complete:boolean;pending:string[];warnings:string[];ownedLand:boolean;nonCashLand:number|null;totals:{income:number;cost:number;net:number};incomeDifference:number|null;costDifference:number|null;deficit:number|null;recoveryMonth:number|null;horizon:number};
+export const stageLabels:string[][];
+export const paymentLabels:string[][];
+export const MAX_MONTHS:number;
+export function validateCashflow(value?:unknown,fail?:(status:number,message:string)=>never):Cashflow;
+export function cashflowFrom(economics?:Record<string,unknown>):Cashflow;
+export function calendarLabel(start:string,index:number):string;
+export function cashflowSummary(input?:{configuration?:Record<string,unknown>;land?:Record<string,unknown>;urban?:Record<string,unknown>;district?:string;economics?:Record<string,unknown>;settings?:Cashflow}):CashResult;
