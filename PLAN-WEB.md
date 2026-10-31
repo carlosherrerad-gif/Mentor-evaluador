@@ -1,5 +1,7 @@
 # Faseo vigente — Méntor web compartido
 
+Actualización 31/10/2026: IGV simplificado a tres columnas de selección única (sin IGV / 18% / 9% efectivo), propuestas editables por concepto y creación de partidas independientes. Desglose base/IGV/total separado del crédito fiscal. Ver ESTADO-IGV-2.md. Caja tributaria mensual e indicadores financieros aún pendientes.
+
 Decisión vigente 24/10/2026: expediente documental, adjuntos e intercambio/restauración de archivos se posponen a una versión posterior. V1 conserva el respaldo JSON de datos y configuraciones. Módulo 02, partes 1–5, implementado localmente; las plantillas de parámetros se editan directamente, sin nuevas versiones. Continúa Módulo 03: resumen físico de Potencial inmobiliario; volumetría 3D y economía requieren entregas aprobadas posteriores.
 
 Avance 21/10/2026: D2 implementada localmente como Módulo 01, incluyendo la biblioteca versionada adelantada desde D6. Detalle y límites en ESTADO-MODULO-01.md. El comparador y los motores de cálculo siguen pendientes. La siguiente fase se define con el usuario antes de implementarla.
