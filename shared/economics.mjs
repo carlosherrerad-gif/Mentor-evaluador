@@ -1,3 +1,4 @@
+import {validateTax} from './tax.mjs';
 import {potentialSummary} from './potential.mjs';
 
 export const costGroups=[['acquisition','Gastos de adquisición'],['construction','Construcción contratada'],['design','Diseño y especialidades'],['permits','Licencias y trámites'],['administration','Administración inmobiliaria'],['marketing','Comercialización'],['aftercare','Postventa y contingencias'],['finance','Financiamiento estimado']];
@@ -11,10 +12,11 @@ export function validateEvaluation(value={},fail=(s,m)=>{throw Error(m);}){
   const str=(v,max=1500)=>{v=v??'';if(typeof v!=='string'||v.length>max)fail(400,'Texto económico inválido o demasiado largo.');return v.trim();};
   const list=(v,max)=>{v=v??[];if(!Array.isArray(v)||v.length>max)fail(400,'Demasiadas partidas económicas.');return v;};
   const costs={};for(const [key] of costGroups){const c=obj(value.costs?.[key]??{}),baseOptions=bases.map(b=>b[0]).filter(b=>key!=='construction'||!['construction','sales','land'].includes(b));
-    const part=p=>{obj(p);const basis=choice(p.basis,baseOptions,'fixed');return {name:str(p.name,120),basis,amount:num(p.amount,basis==='sales'||basis==='construction'||basis==='land'?100:1e12),months:num(p.months,1200,true)};};
-    const p=part(c);costs[key]={status:choice(c.status,['pending','active','na','included'],'pending'),mode:choice(c.mode,key==='construction'?['quick','detail','rates']:['quick','detail'],'quick'),basis:p.basis,amount:p.amount,months:p.months,floors:num(c.floors),basements:num(c.basements),roof:num(c.roof),items:list(c.items,80).map(part),note:str(c.note)};
+    const part=p=>{obj(p);const basis=choice(p.basis,baseOptions,'fixed');return {name:str(p.name,120),basis,amount:num(p.amount,basis==='sales'||basis==='construction'||basis==='land'?100:1e12),months:num(p.months,1200,true),tax:validateTax(p.tax,fail)};};
+    const p=part(c);costs[key]={status:choice(c.status,['pending','active','na','included'],'pending'),mode:choice(c.mode,key==='construction'?['quick','detail','rates']:['quick','detail'],'quick'),basis:p.basis,amount:p.amount,months:p.months,floors:num(c.floors),basements:num(c.basements),roof:num(c.roof),items:list(c.items,80).map(part),note:str(c.note),tax:validateTax(c.tax,fail)};
   }
-  return {currency:choice(value.currency,['PEN','USD'],'PEN'),fx:num(value.fx,10000),taxBasis:choice(value.taxBasis,['pending','included','excluded'],'pending'),salesPrice:num(value.salesPrice),parkingPrice:num(value.parkingPrice),hypothesisPrice:num(value.hypothesisPrice),priceGroups:list(value.priceGroups,100).map(p=>{obj(p);const from=num(p.from,200,true),to=num(p.to,200,true);if(from===0||to===0)fail(400,'Rango de pisos inválido.');return {from,to,price:num(p.price)};}),otherIncome:list(value.otherIncome,80).map(p=>{obj(p);return {name:str(p.name,120),amount:num(p.amount)};}),costs,reviewKey:str(value.reviewKey,50000),notes:str(value.notes)};
+  const taxes={};if(value.taxes!==undefined)obj(value.taxes);for(const key of ['residential','parking','land'])taxes[key]=validateTax(value.taxes?.[key],fail);
+  return {taxes,currency:choice(value.currency,['PEN','USD'],'PEN'),fx:num(value.fx,10000),taxBasis:choice(value.taxBasis,['pending','included','excluded'],'pending'),salesPrice:num(value.salesPrice),parkingPrice:num(value.parkingPrice),hypothesisPrice:num(value.hypothesisPrice),priceGroups:list(value.priceGroups,100).map(p=>{obj(p);const from=num(p.from,200,true),to=num(p.to,200,true);if(from===0||to===0)fail(400,'Rango de pisos inválido.');return {from,to,price:num(p.price)};}),otherIncome:list(value.otherIncome,80).map(p=>{obj(p);return {name:str(p.name,120),amount:num(p.amount),tax:validateTax(p.tax,fail)};}),costs,reviewKey:str(value.reviewKey,50000),notes:str(value.notes)};
 }
 export const evaluationFrom=economics=>validateEvaluation(economics?.evaluation??{});
 const sum=values=>values.some(v=>v===null)?null:values.reduce((a,b)=>a+b,0);

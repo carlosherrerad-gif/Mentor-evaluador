@@ -1,8 +1,9 @@
+import type {TaxRule} from './tax.mjs';
 import type {Potential} from './potential.mjs';
 export type Basis='fixed'|'floors'|'basements'|'roof'|'built'|'units'|'parking'|'months'|'sales'|'construction'|'land';
-export type Part={name:string;basis:Basis;amount:number|null;months:number|null};
-export type Cost={status:'pending'|'active'|'na'|'included';mode:'quick'|'detail'|'rates';basis:Basis;amount:number|null;months:number|null;floors:number|null;basements:number|null;roof:number|null;items:Part[];note:string};
-export type Evaluation={currency:'PEN'|'USD';fx:number|null;taxBasis:'pending'|'included'|'excluded';salesPrice:number|null;parkingPrice:number|null;hypothesisPrice:number|null;priceGroups:{from:number|null;to:number|null;price:number|null}[];otherIncome:{name:string;amount:number|null}[];costs:Record<string,Cost>;reviewKey:string;notes:string};
+export type Part={tax?:TaxRule;name:string;basis:Basis;amount:number|null;months:number|null};
+export type Cost={tax?:TaxRule;status:'pending'|'active'|'na'|'included';mode:'quick'|'detail'|'rates';basis:Basis;amount:number|null;months:number|null;floors:number|null;basements:number|null;roof:number|null;items:Part[];note:string};
+export type Evaluation={taxes:Record<string,TaxRule>;currency:'PEN'|'USD';fx:number|null;taxBasis:'pending'|'included'|'excluded';salesPrice:number|null;parkingPrice:number|null;hypothesisPrice:number|null;priceGroups:{from:number|null;to:number|null;price:number|null}[];otherIncome:{name:string;amount:number|null;tax?:TaxRule}[];costs:Record<string,Cost>;reviewKey:string;notes:string};
 export const costGroups:string[][];
 export const bases:string[][];
 export function emptyCost():Cost;

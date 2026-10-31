@@ -1,7 +1,7 @@
 import type {EconomicResult} from './economics.mjs';
 export type StageSetting={mode:'auto'|'manual'|'na';start:number|null;duration:number|null};
 export type PaymentSetting={mode:'auto'|'manual';start:number|null;duration:number|null};
-export type Cashflow={startMonth:string;velocity:number|null;presalePercent:number|null;constructionMonths:number|null;stages:Record<string,StageSetting>;payments:Record<string,PaymentSetting>;collections:{mode:'sale'|'split';initialPercent:number|null;lag:number|null};otherIncomeMonth:number|null;manualReference:string;notes:string};
+export type Cashflow={timelineVersion:number;timelineReview:boolean;startMonth:string;velocity:number|null;presalePercent:number|null;constructionMonths:number|null;stages:Record<string,StageSetting>;payments:Record<string,PaymentSetting>;collections:{mode:'sale'|'split';initialPercent:number|null;lag:number|null};otherIncomeMonth:number|null;manualReference:string;notes:string};
 export type Stage={key:string;label:string;mode:StageSetting['mode'];start:number|null;duration:number|null;end:number|null};
 export type PaymentRow={key:string;label:string;total:number|null;cash:number|null;nonCash:boolean;mode:'auto'|'manual';start:number|null;duration:number|null;end:number|null};
 export type CashMonth={month:number;label:string;presales:number;sales:number;parking:number;residential:number;parkingIncome:number;otherIncome:number;incomeRounding:number;payments:Record<string,number>;costRounding:number;income:number;cost:number;net:number;cumulative:number};
