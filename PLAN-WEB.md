@@ -1,5 +1,7 @@
 # Faseo vigente — Méntor web compartido
 
+Actualización 31/10/2026: Ingresos y Costos incorporan columnas IGV, importe sin IGV, total con IGV y porcentaje automático sobre ventas brutas base; desglose y subtotales concilian sin duplicar partidas. Ver ESTADO-PRESUPUESTO-IGV.md. Caja tributaria mensual sigue pendiente.
+
 Actualización 31/10/2026: IGV simplificado a tres columnas de selección única (sin IGV / 18% / 9% efectivo), propuestas editables por concepto y creación de partidas independientes. Desglose base/IGV/total separado del crédito fiscal. Ver ESTADO-IGV-2.md. Caja tributaria mensual e indicadores financieros aún pendientes.
 
 Decisión vigente 24/10/2026: expediente documental, adjuntos e intercambio/restauración de archivos se posponen a una versión posterior. V1 conserva el respaldo JSON de datos y configuraciones. Módulo 02, partes 1–5, implementado localmente; las plantillas de parámetros se editan directamente, sin nuevas versiones. Continúa Módulo 03: resumen físico de Potencial inmobiliario; volumetría 3D y economía requieren entregas aprobadas posteriores.
