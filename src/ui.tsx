@@ -4,7 +4,7 @@ export const roles={admin:'Administrador',editor:'Editor',reader:'Lector'};
 export const statuses={draft:'Borrador',active:'En evaluación',archived:'Archivado'};
 export const date=(value:string)=>new Intl.DateTimeFormat('es-PE',{day:'2-digit',month:'short',year:'numeric',timeZone:'America/Lima'}).format(new Date(value));
 export const message=(error:unknown)=>error instanceof Error?error.message:'No se pudo completar la operación.';
-export function Brand(){return <div className="brand"><span className="brand-mark">M</span><div>MÉNTOR<small>INGENIERÍA E INVERSIÓN</small></div></div>;}
+export function Brand(){return <div className="brand" aria-label="Méntor · Inmobiliaria y BIM"><svg className="brand-official-symbol" viewBox="400 190 445 610" role="img" aria-label="Logo oficial de Méntor"><image href="/brand/mentor-oficial.jpg" width="1254" height="1254"/></svg><div>MÉNTOR<small>Inmobiliaria y BIM</small></div></div>;}
 export function Button({children,onClick,secondary=false,disabled=false,type='button'}:{children:ReactNode;onClick?:()=>void;secondary?:boolean;disabled?:boolean;type?:'button'|'submit'}){return <button className={secondary?'button secondary':'button'} type={type} onClick={onClick} disabled={disabled}>{children}</button>;}
 export function ErrorBox({text}:{text:string}){return text?<div className="error" role="alert">{text}</div>:null;}
 export function Modal({title,children,onClose}:{title:string;children:ReactNode;onClose:()=>void}){
