@@ -1,3 +1,4 @@
+import {profileIgv} from './profile-igv.mjs';
 import {economicSummary,costGroups} from './economics.mjs';
 
 export const stageLabels=[['land','Adquisición del terreno'],['design','Diseño y especialidades'],['permits','Licencias y trámites'],['presale','Preventa'],['construction','Construcción'],['sales','Venta del saldo'],['delivery','Entrega e independización'],['aftercare','Postventa']];
@@ -12,16 +13,17 @@ export function validateCashflow(value={},fail=(s,m)=>{throw Error(m);}){
   const stages={},payments={};if(value.stages!==undefined)obj(value.stages);if(value.payments!==undefined)obj(value.payments);
   for(const [key] of stageLabels){const s=obj(value.stages?.[key]??{});stages[key]={mode:choice(s.mode,['auto','manual','na'],'auto'),start:number(s.start,null,240,true,0),duration:number(s.duration,null)};}
   for(const [key] of paymentLabels){const p=obj(value.payments?.[key]??{});payments[key]={mode:choice(p.mode,['auto','manual'],'auto'),start:number(p.start,null,240,true,0),duration:number(p.duration,null)};}
-  const c=obj(value.collections??{});
+  const c=obj(value.collections??{}),tax=obj(value.igv??{});if(tax.enabled!==undefined&&typeof tax.enabled!=='boolean')fail(400,'Activación de IGV inválida.');
+  const igv={enabled:tax.enabled??true,creditPercent:number(tax.creditPercent,100,100,false,0),creditLag:number(tax.creditLag,0,12,true,0),paymentLag:number(tax.paymentLag,1,12,true,1),openingCredit:number(tax.openingCredit,0,1e12,false,0)};
   const timelineVersion=value.timelineVersion??1;if(![1,2].includes(timelineVersion))fail(400,'Versión de cronograma inválida.');if(value.timelineReview!==undefined&&typeof value.timelineReview!=='boolean')fail(400,'Revisión de cronograma inválida.');
-  return {timelineVersion,timelineReview:value.timelineReview??false,startMonth,velocity:number(value.velocity,2,1000,false,.01),presalePercent:number(value.presalePercent,30,100,false,0),constructionMonths:number(value.constructionMonths,12),stages,payments,collections:{mode:choice(c.mode,['sale','split'],'sale'),initialPercent:number(c.initialPercent,30,100,false,0),lag:number(c.lag,0,240,true,0)},otherIncomeMonth:number(value.otherIncomeMonth,null,240,true,0),manualReference:text(value.manualReference,10000),notes:text(value.notes)};
+  return {igv,timelineVersion,timelineReview:value.timelineReview??false,startMonth,velocity:number(value.velocity,2,1000,false,.01),presalePercent:number(value.presalePercent,30,100,false,0),constructionMonths:number(value.constructionMonths,12),stages,payments,collections:{mode:choice(c.mode,['sale','split'],'sale'),initialPercent:number(c.initialPercent,30,100,false,0),lag:number(c.lag,0,240,true,0)},otherIncomeMonth:number(value.otherIncomeMonth,null,240,true,0),manualReference:text(value.manualReference,10000),notes:text(value.notes)};
 }
 export function cashflowFrom(e){return normalizeTimeline(validateCashflow(e?.cashflow??{timelineVersion:2}));}
 function normalizeTimeline(v){if(v.timelineVersion===2)return v;const next=structuredClone(v);next.timelineVersion=2;let manual=false;for(const group of [next.stages,next.payments])for(const s of Object.values(group))if(s.mode==='manual'){manual=true;if(s.start!==null)s.start=Math.max(0,s.start-1);}if(next.otherIncomeMonth!==null)next.otherIncomeMonth=Math.max(0,next.otherIncomeMonth-1);next.timelineReview=manual;return next;}
 const cents=v=>v===null?null:Math.round(v*100);
 const ceil=v=>Math.ceil(v-1e-9);
 export function calendarLabel(start,index){if(!start)return `Mes ${index}`;const [year,month]=start.split('-').map(Number);return new Intl.DateTimeFormat('es-PE',{month:'short',year:'2-digit',timeZone:'UTC'}).format(new Date(Date.UTC(year,month+index-1,1)));}
-export function cashflowSummary({configuration={},land={},urban={},district='',economics={},settings=cashflowFrom(economics)}={}){
+function cashflowBaseSummary({configuration={},land={},urban={},district='',economics={},settings=cashflowFrom(economics)}={}){
   const v=normalizeTimeline(validateCashflow(settings)),economic=economicSummary({configuration,land,urban,district,economics}),pending=[],warnings=[];
   const units=economic.physical.metrics.units,parkingUnits=economic.physical.metrics.commercial,velocity=v.velocity;
   if(units===null)pending.push('Completa las viviendas del escenario.');if(!velocity)pending.push('Registra una velocidad de ventas positiva.');
@@ -97,3 +99,5 @@ export function cashflowSummary({configuration={},land={},urban={},district='',e
   function result(rows){const totalIncome=rows.reduce((s,m)=>s+m.income,0),totalCost=rows.reduce((s,m)=>s+m.cost,0),allPending=[...new Set(pending)],complete=allPending.length===0&&economic.complete,low=Math.min(0,...rows.map(m=>m.cumulative)),recovery=complete?rows.find((m,i)=>rows.slice(0,i).some(n=>n.cumulative<0)&&m.cumulative>=0&&rows.slice(i).every(n=>n.cumulative>=0))?.month??null:null;
     return {settings:v,economic,stages:stageLabels.map(([k])=>stages.find(s=>s.key===k)),paymentRows,reference,units,presaleTarget,salesMonths,preMonths,months:rows,complete,pending:allPending,warnings:[...new Set([...warnings,...economic.warnings])],ownedLand:owned,nonCashLand:owned?economic.landCost:0,totals:{income:totalIncome/100,cost:totalCost/100,net:(totalIncome-totalCost)/100},incomeDifference:economic.revenues.total===null?null:totalIncome/100-Math.round(economic.revenues.total*100)/100,costDifference:economic.cost===null?null:totalCost/100-Math.round((economic.cost-(owned?economic.landCost??0:0))*100)/100,deficit:complete?Math.max(0,-low/100):null,recoveryMonth:recovery,horizon:rows.length?rows.at(-1).month:0};}
 }
+
+export function cashflowSummary(input={}){const base=cashflowBaseSummary(input);return profileIgv(base,input.economics??{},month=>calendarLabel(base.settings.startMonth,month));}

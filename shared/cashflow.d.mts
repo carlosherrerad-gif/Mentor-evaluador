@@ -1,11 +1,14 @@
 import type {EconomicResult} from './economics.mjs';
 export type StageSetting={mode:'auto'|'manual'|'na';start:number|null;duration:number|null};
 export type PaymentSetting={mode:'auto'|'manual';start:number|null;duration:number|null};
-export type Cashflow={timelineVersion:number;timelineReview:boolean;startMonth:string;velocity:number|null;presalePercent:number|null;constructionMonths:number|null;stages:Record<string,StageSetting>;payments:Record<string,PaymentSetting>;collections:{mode:'sale'|'split';initialPercent:number|null;lag:number|null};otherIncomeMonth:number|null;manualReference:string;notes:string};
+export type IgvSettings={enabled:boolean;creditPercent:number|null;creditLag:number|null;paymentLag:number|null;openingCredit:number|null};
+export type MonthlyIgv={debit:number;inputTax:number;creditGenerated:number;creditAvailable:number;openingCredit:number;due:number;closingCredit:number;payment:number};
+export type ProfileIgv={enabled:boolean;creditAssumed:number;debit:number;inputTax:number;credit:number;paid:number;closingCredit:number;unpaid:number;pending:string[];assumptions:string[]};
+export type Cashflow={igv:IgvSettings;timelineVersion:number;timelineReview:boolean;startMonth:string;velocity:number|null;presalePercent:number|null;constructionMonths:number|null;stages:Record<string,StageSetting>;payments:Record<string,PaymentSetting>;collections:{mode:'sale'|'split';initialPercent:number|null;lag:number|null};otherIncomeMonth:number|null;manualReference:string;notes:string};
 export type Stage={key:string;label:string;mode:StageSetting['mode'];start:number|null;duration:number|null;end:number|null};
 export type PaymentRow={key:string;label:string;total:number|null;cash:number|null;nonCash:boolean;mode:'auto'|'manual';start:number|null;duration:number|null;end:number|null};
-export type CashMonth={month:number;label:string;presales:number;sales:number;parking:number;residential:number;parkingIncome:number;otherIncome:number;incomeRounding:number;payments:Record<string,number>;costRounding:number;income:number;cost:number;net:number;cumulative:number};
-export type CashResult={settings:Cashflow;economic:EconomicResult;stages:Stage[];paymentRows:PaymentRow[];reference:string;units:number|null;presaleTarget:number|null;salesMonths:number|null;preMonths:number|null;months:CashMonth[];complete:boolean;pending:string[];warnings:string[];ownedLand:boolean;nonCashLand:number|null;totals:{income:number;cost:number;net:number};incomeDifference:number|null;costDifference:number|null;deficit:number|null;recoveryMonth:number|null;horizon:number};
+export type CashMonth={igv:MonthlyIgv;operatingNet:number;month:number;label:string;presales:number;sales:number;parking:number;residential:number;parkingIncome:number;otherIncome:number;incomeRounding:number;payments:Record<string,number>;costRounding:number;income:number;cost:number;net:number;cumulative:number};
+export type CashResult={igv:ProfileIgv;settings:Cashflow;economic:EconomicResult;stages:Stage[];paymentRows:PaymentRow[];reference:string;units:number|null;presaleTarget:number|null;salesMonths:number|null;preMonths:number|null;months:CashMonth[];complete:boolean;pending:string[];warnings:string[];ownedLand:boolean;nonCashLand:number|null;totals:{income:number;cost:number;net:number;supplierCost?:number;taxPaid?:number};incomeDifference:number|null;costDifference:number|null;deficit:number|null;recoveryMonth:number|null;horizon:number};
 export const stageLabels:string[][];
 export const paymentLabels:string[][];
 export const MAX_MONTHS:number;

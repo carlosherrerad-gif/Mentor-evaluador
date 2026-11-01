@@ -1,5 +1,7 @@
 # Faseo vigente — Méntor web compartido
 
+Actualización 01/11/2026: IGV mensual implementado como estimación de perfil, con cobros/pagos brutos, crédito propuesto editable, compensación y pago al mes siguiente. Actualiza déficit y caja, sin devolución automática del saldo a favor. Ver ESTADO-PERFIL-IGV-MENSUAL.md. Siguiente etapa: esquema de VAN/TIR del proyecto; después financiación/aportes e indicadores del socio.
+
 Actualización 31/10/2026: Ingresos y Costos incorporan columnas IGV, importe sin IGV, total con IGV y porcentaje automático sobre ventas brutas base; desglose y subtotales concilian sin duplicar partidas. Ver ESTADO-PRESUPUESTO-IGV.md. Caja tributaria mensual sigue pendiente.
 
 Actualización 31/10/2026: IGV simplificado a tres columnas de selección única (sin IGV / 18% / 9% efectivo), propuestas editables por concepto y creación de partidas independientes. Desglose base/IGV/total separado del crédito fiscal. Ver ESTADO-IGV-2.md. Caja tributaria mensual e indicadores financieros aún pendientes.
