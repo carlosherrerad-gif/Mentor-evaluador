@@ -42,3 +42,6 @@ Sección propia en el menú, disponible para todos los equipos con los permisos 
 ### IGV por concepto y cronograma · 30/10/2026
 
 Primera entrega de la siguiente etapa: terreno en mes 0, preparación/preventa desde mes 1, saldo en el mes siguiente al cierre de preventa. Fechas manuales anteriores conservadas con revisión explícita. Clasificación tributaria por concepto y conciliación adicional de base, IGV, total y crédito proyectado en Evaluación económica → IGV. El presupuesto y el flujo conservan importes de origen hasta la entrega de caja tributaria mensual. VAN/TIR y financiamiento aún pendientes. Ver ESTADO-IGV-1.md y docs/CRITERIOS-EVALUACION-FINANCIERA.md. Estos criterios sustituyen las reglas anteriores de compartir capacidad en el último mes de preventa y comenzar la adquisición en mes 1.
+
+### Evaluación gerencial · primera entrega · 02/11/2026
+Implementados resumen ejecutivo, VAN/TIR del proyecto, metas editables, equilibrio comercial y recuperación estable de caja; conciliación de utilidad/IGV/terreno propio. Antes de IR y sin deuda. Reemplaza el estado pendiente anterior de VAN/TIR. Sensibilidad, financiación e informes siguen pendientes. Ver ESTADO-EVALUACION-GERENCIAL-1.md.

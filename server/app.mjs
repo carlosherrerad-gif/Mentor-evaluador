@@ -1,3 +1,4 @@
+import {executiveRoutes} from './executive.mjs';
 import {cashflowRoutes} from './cashflow.mjs';
 import {economicRoutes} from './economics.mjs';
 import {urbanCheckRoutes} from './urban-checks.mjs';
@@ -154,6 +155,7 @@ export function createMentorServer({ filename = resolve(root,'data/mentor.sqlite
         session(res,member); return send(200,{user:publicUser(member),projectId:invite.project_id});
       }
       if (!user) fail(401,'Inicia sesión para continuar.');
+      if (await executiveRoutes({path,req,user,store,body,fail,access:checkAccess,send})) return;
       if (await cashflowRoutes({path,req,user,store,body,fail,access:checkAccess,send})) return;
       if (await economicRoutes({path,req,user,store,body,fail,access:checkAccess,send})) return;
       if (urbanCheckRoutes({path,req,user,store,access:checkAccess,send,fail})) return;
