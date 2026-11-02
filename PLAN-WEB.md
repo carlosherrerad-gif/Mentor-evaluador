@@ -45,3 +45,6 @@ Primera entrega de la siguiente etapa: terreno en mes 0, preparación/preventa d
 
 ### Evaluación gerencial · primera entrega · 02/11/2026
 Implementados resumen ejecutivo, VAN/TIR del proyecto, metas editables, equilibrio comercial y recuperación estable de caja; conciliación de utilidad/IGV/terreno propio. Antes de IR y sin deuda. Reemplaza el estado pendiente anterior de VAN/TIR. Sensibilidad, financiación e informes siguen pendientes. Ver ESTADO-EVALUACION-GERENCIAL-1.md.
+
+### Cobros de clientes · 02/11/2026
+Implementada sección Financiamiento con separación, inicial y saldo, condiciones diferenciadas y disponibilidad desde cobro u obra. Integrada al flujo y gerencia. Préstamo bancario y capital propio pendientes del siguiente esquema. Ver ESTADO-COBRANZAS-1.md.
